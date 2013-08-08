@@ -13,6 +13,7 @@ some of the logic here. Even still, it was an excellent way for me to learn abou
 The biggest takeaway from this project was just how insignificant the barrier to entry is for graphic development right now. If
 you have a text editor and a browser, you can make engaging visualizations or even video games *right now*.
 
+
 ## Setting up your environment
 
 There's no point in going too deep into the canvas element and its 2d context because there are [better articles](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial) dedicated to it.
