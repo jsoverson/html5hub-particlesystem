@@ -479,12 +479,14 @@ function draw() {
 Congratulations! You can see the final demo here at copepen.io [JavaScript Particle System Demo](http://cdpn.io/KtxmA)
 
 Play around with a variety of different emitter and field combinations. Turn the mouse into a field or emitter
-by tracking the mouse position and updating the position of an emitter or field.
+by tracking the mouse position and updating the position of an emitter or field. Fork the codepen and try something new!
 
-You can try the following combinations of emitters and fields. Fork the codepen and try something new!
+You can try the following combinations of emitters and fields.
 
 ```javascript
-var emitters = [new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2))];
+var emitters = [
+  new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2))
+];
 
 var fields = [
   new Field(new Vector(midX - 100, midY + 20), 150),
@@ -496,7 +498,9 @@ var fields = [
 
 
 ```javascript
-var emitters = [new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)];
+var emitters = [
+  new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)
+];
 
 var fields = [
   new Field(new Vector(midX - 300, midY + 20), 900),
