@@ -1,22 +1,22 @@
 
 
-Build a Particle System in 150 Lines
----------------------------------------
+Build a Particle System in 200 Lines
+------------------------------------
 
-In less than 150 lines of vanilla JavaScript you will have a flexible particle system with multiple emitters
+In less than 200 lines of vanilla JavaScript you will have a flexible particle system with multiple emitters
 and fields that repel and attract thousands of particles.
 
 This started as a [personal project](jarrodoverson.com/static/demos/particleSystem/) that ended up as a [chrome experiment](http://www.chromeexperiments.com/detail/gravitational-particle-system-sandbox/?f=) 2 to 3 years ago when I started becoming serious about JavaScript
 development. I am not a mathemetician, physicist, or game developer so there are likely many better ways to approach
-some of the logic here but it was an excellent way for me to learn about modern JavaScript performance.
+some of the logic here. Even still, it was an excellent way for me to learn about JavaScript performance during that time.
 
-The biggest takeaway from this project was just how insignificant the barrier to entry is for graphic development now. If
+The biggest takeaway from this project was just how insignificant the barrier to entry is for graphic development right now. If
 you have a text editor and a browser, you can make engaging visualizations or even video games *right now*.
 
 ## Setting up your environment
 
-I won't go too deep into the canvas element and its 2d context because there are [better articles](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial) dedicated to it, so let's
-get something basic together.
+There's no point in going too deep into the canvas element and its 2d context because there are [better articles](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Canvas_tutorial) dedicated to it.
+If you need further information, there is [plenty to choose from](https://www.google.com/search?q=canvas+tutorials&oq=canvas+tutorials);
 
 ```html
 <!DOCTYPE html>
@@ -27,9 +27,9 @@ get something basic together.
 </html>
 ```
 
-Yep, seriously. This is the world we live in now. 3 nested tags is all we need.
+Yep, that's it. This is the world we live in now. 3 nested tags is all we need to get a usable environment off the ground.
 
-To give us a cleaner start, let's add some style to eliminate padding and add a black background.
+To give us a cleaner foundation, let's add some style to eliminate padding and add a black background.
 
 ```html
 <html>
@@ -53,34 +53,34 @@ To give us a cleaner start, let's add some style to eliminate padding and add a 
 ## The Canvas Object
 
 
-First we need access to our canvas which we can get by grabbing the element any way you are comfortable with.
+To access our canvas we just need to grab the element any way you are comfortable with.
 
-```
+```javascript
 var canvas = document.querySelector('canvas');
 ```
 
 The canvas element has multiple "contexts" and what we're looking for right now is the basic 2d context, allowing us to
-manipulate the canvas as a bitmap with a variety of [intuitive methods](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
+manipulate the canvas as a bitmap with a variety of [classic methods](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
 
-```
+```javascript
 var ctx = canvas.getContext('2d');
 ```
 
 In order to maximize our drawing area, we can also set the canvas dimensions to fill the entire window
 
-```
+```javascript
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 ```
 
 ## The Animation Loop
 
-The animation loop is the first foreign concept if you're coming from a traditional application development background.
+The animation loop is the first foreign concept you'll come across if you're coming from traditional application development.
 When dealing with graphics in this way you'll want to manage your state of the system separately from the drawing so
 you'll have two distinct steps for the update and the draw. You'll also need to clear the current canvas and then queue up
-the next animation cycle.
+the next animation cycle. The process can be summed up in the code below.
 
-```
+```javascript
 function loop() {
   clear();
   update();
@@ -92,27 +92,27 @@ function loop() {
 Clearing the canvas in our case is a single line, but it could become more complicated when dealing with multiple
 buffers or drawing states.
 
-```
+```javascript
 function clear() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 ```
 
 Queueing up the next cycle could be a `setTimeout()` but that would also make our animation run when we didn't have
-focus, so we use the offered [window.requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame)
-method in order to defer to the browser to tell us when we should animate our next frame. This method is mostly unprefixed
+focus, so we use the offered [requestAnimationFrame API](https://developer.mozilla.org/en-US/docs/Web/API/window.requestAnimationFrame)
+in order to defer to the browser to tell us when we should animate our next frame. This method is mostly unprefixed
 now but if you need to manage compatibility with older browsers, please see [Paul Irish's solution](http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/).
 
-```
+```javascript
 function queue() {
   window.requestAnimationFrame(loop);
 }
 ```
 
-The `update()` and `draw()` functions compose the vast majority of logic but stub them out for now and then initiate
+The `update()` and `draw()` functions compose the vast majority of logic but you can stub them out for now and then initiate
 the first run of your loop to set up a solid foundation for canvas experimentation.
 
-```
+```javascript
 function update() {
 // stub
 }
@@ -124,9 +124,10 @@ function draw() {
 loop();
 ```
 
-The final code for the foundation should look like below. The way you organize and set up the rest of the code is up to you, but the complete example will be linked below for comparison.
+The final code for the foundation should look like below. The way you organize and set up the rest of the code
+is up to you, but the complete example will be linked at the bottom of the article for demo and comparison.
 
-```
+```javascript
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 
@@ -175,7 +176,7 @@ Don't get hung up overthinking this yet.
 
 A 2d vector at its core is just a representation of an X and a Y coordinate.
 
-```
+```javascript
 function Vector(x, y) {
   this.x = x || 0;
   this.y = y || 0;
@@ -184,7 +185,7 @@ function Vector(x, y) {
 
 There are a slew of utility methods that can hang off of Vector but the only ones that we'll need for the immediate future are
 
-```
+```javascript
 // Add a vector to another
 Vector.prototype.add = function(vector) {
   this.x += vector.x;
@@ -212,7 +213,7 @@ Vector.fromAngle = function (angle, magnitude) {
 Now that we can represent Vectors we can put together our particle object. We can pass in each property or default to a
 stationary particle located at the origin, `0,0`.
 
-```
+```javascript
 function Particle(point, velocity, acceleration) {
   this.position = point || new Vector(0, 0);
   this.velocity = velocity || new Vector(0, 0);
@@ -221,8 +222,9 @@ function Particle(point, velocity, acceleration) {
 ```
 
 Each frame we're going to want move our particle and the method to do this is pretty straightforward and intuitive.
+If we are accellerating, modify the velocity. Afterward, add the velocity to the position.
 
-```
+```javascript
 Particle.prototype.move = function () {
   // Add our current acceleration to our current velocity
   this.velocity.add(this.acceleration);
@@ -240,7 +242,7 @@ have their own propulsion or are effected by gravity.
 
 Our emitters will just push out particles from a set point, at a set rate, and across a set angle.
 
-```
+```javascript
 function Emitter(point, velocity, spread) {
   this.position = point; // Vector
   this.velocity = velocity; // Vector
@@ -252,7 +254,7 @@ function Emitter(point, velocity, spread) {
 To get our particles we'll need the emitter to spawn them. This amounts to just creating a new `Particle` with values
 derived from our emitter's properties and this is where our `Vector.fromAngle` method comes in handy.
 
-```
+```javascript
 Emitter.prototype.emitParticle = function() {
   // Use an angle randomized over the spread so we have more of a "spray"
   var angle = this.velocity.getAngle() + this.spread - (Math.random() * this.spread * 2);
@@ -276,9 +278,9 @@ Emitter.prototype.emitParticle = function() {
 We have nearly everything we need to start simulating the state of a particle system so now we can start building
 our `update()` and `draw()` methods
 
-To manage our state, we'll need containers for our particles and emitters, which can be simple arrays.
+To manage our state, we'll need containers for our particles and emitters which can be simple arrays.
 
-```
+```javascript
 var particles = [];
 
 // Add one emitter located at `{ x : 100, y : 230}` from the origin (top left)
@@ -289,7 +291,7 @@ var emitters = [new Emitter(new Vector(100, 230), Vector.fromAngle(0, 2))],
 What might our update function look like? We'd need to generate new particles and them move them. We might want
 to bound them to a certain rectangle so we don't have to occupy the entire canvas at all times.
 
-```
+```javascript
 // new update() function called from our animation loop
 function update() {
   addNewParticles();
@@ -300,8 +302,8 @@ function update() {
 The `addNewParticles()` function is straightforward; for each emitter, emit a number of particles and store each
   in our particles array.
 
-```
-var maxParticles = 200; // experiment with what performs well
+```javascript
+var maxParticles = 200; // experiment! 20,000 provides a nice galaxy
 var emissionRate = 4; // how many particles are emitted each frame
 
 function addNewParticles() {
@@ -325,7 +327,7 @@ that have gone out of the bounds of rendering, so we need to manage that and mak
 is where the bounds arguments come into play; we might only want to render a small portion of the screen with particles. In
 this case we're ok with being bound by the canvas.
 
-```
+```javascript
 function plotParticles(boundsX, boundsY) {
   // a new array to hold particles within our bounds
   var currentParticles = [];
@@ -349,10 +351,10 @@ function plotParticles(boundsX, boundsY) {
 }
 ```
 
-Our state is being updated every frame! Now we just need to draw something. We're just drawing squares here but
-you could draw sparks, smoke, water, birds or falling leaves.
+Our state is now being updated every frame, and we just need to draw something. We're simply drawing squares here but
+you could draw sparks, smoke, water, birds or falling leaves. Particles! They're everything and everywhere!
 
-```
+```javascript
 var particleSize = 1;
 
 function drawParticles() {
@@ -369,14 +371,14 @@ function drawParticles() {
 }
 ```
 
-That's it! You can this state demoed at [Emitter demo](http://cdpn.io/chGDt)
+That's it! You can this state demoed at codepen : [Emitter demo](http://cdpn.io/chGDt)
 
 ## Adding Fields
 
 In our system, a field is just a point in space that attracts or repels. The mass can be positive (attractive) or negative
 (repelling). I used a setter for `mass` so that `drawColor` can be updated depending on whether the field attracted (green) or repelled (red).
 
-```
+```javascript
 function Field(point, mass) {
   this.position = point;
   this.setMass(mass);
@@ -384,7 +386,7 @@ function Field(point, mass) {
 ```
 
 
-```
+```javascript
 Field.prototype.setMass = function(mass) {
   this.mass = mass || 100;
   this.drawColor = mass < 0 ? "#f00" : "#0f0";
@@ -393,17 +395,17 @@ Field.prototype.setMass = function(mass) {
 
 We can now set up our first Field in our system a similar way to our emitters.
 
-```
+```javascript
 // Add one field located at `{ x : 400, y : 230}` (to the right of our emitter)
 // that has a mass of `-140`
 var fields = [new Field(new Vector(400, 230), -140)];
 ```
 
-We'll need each of our particles to update its velocity and acceleration based on passed fields so we'll need to add
+We'll need each of our particles to update its velocity and acceleration based on our fields so we'll need to add
 a method to the `Particle` prototype. Some of the internal logic would make sense as `Vector` methods but they've been inlined here
-to improve performance on a method called very often.
+to improve performance on an expensive method called very often.
 
-```
+```javascript
 Particle.prototype.submitToFields = function (fields) {
   // our starting acceleration this frame
   var totalAccelerationX = 0;
@@ -430,9 +432,9 @@ Particle.prototype.submitToFields = function (fields) {
 };
 ```
 
-We already have our `plotParticles` function, we can now just plug in the step to `submitToFields` right before we move the particles.
+We already have our `plotParticles` function, we can now just plug in `submitToFields` right before we move the particles.
 
-```
+```javascript
 function plotParticles(boundsX, boundsY) {
   var currentParticles = [];
   for (var i = 0; i < particles.length; i++) {
@@ -452,7 +454,7 @@ function plotParticles(boundsX, boundsY) {
 
 It would be nice to also visualize our fields and emitters, so we can add a utility method and a call in our `draw()` function to do so.
 
-```
+```javascript
 // `object` is a field or emitter, something that has a drawColor and position
 function drawCircle(object) {
   ctx.fillStyle = object.drawColor;
@@ -463,7 +465,7 @@ function drawCircle(object) {
 }
 ```
 
-```
+```javascript
 // Updated draw() function
 function draw() {
   drawParticles();
@@ -472,14 +474,16 @@ function draw() {
 }
 ```
 
-You can see the final demo here at copepen.io [JavaScript Particle System Example](http://cdpn.io/KtxmA)
+## Demos
 
-Try to play around with a variety of different emitter and field combinations. Turn the mouse into a field or emitter
+Congratulations! You can see the final demo here at copepen.io [JavaScript Particle System Demo](http://cdpn.io/KtxmA)
+
+Play around with a variety of different emitter and field combinations. Turn the mouse into a field or emitter
 by tracking the mouse position and updating the position of an emitter or field.
 
-Try the following combinations of emitters and fields :
+You can try the following combinations of emitters and fields. Fork the codepen and try something new!
 
-```
+```javascript
 var emitters = [new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2))];
 
 var fields = [
@@ -491,7 +495,7 @@ var fields = [
 [demo](http://cdpn.io/pkEqs)
 
 
-```
+```javascript
 var emitters = [new Emitter(new Vector(midX - 150, midY), Vector.fromAngle(6, 2), Math.PI)];
 
 var fields = [
